@@ -1,4 +1,7 @@
 {
   "API接口服务IP": "指定监听IP",
-  "apiHostAndPort": "127.0.0.1:8090"
+  "apiHostAndPort": "127.0.0.1:8090",
+
+  "数据库配置": "数据库详细配置",
+  "apiDatabaseConf": "root:abc123456@tcp(148.70.167.240:3306)/ddz?charset=utf8"
 }

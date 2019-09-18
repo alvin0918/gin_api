@@ -8,6 +8,7 @@ import (
 // 程序配置
 type Config struct {
 	ApiHostAndPort string `json:"apiHostAndPort"`
+	ApiDatabaseConf string `json:"apiDatabaseConf"`
 }
 
 var (

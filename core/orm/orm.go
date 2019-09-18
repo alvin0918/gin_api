@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/alvin0918/gin_api/core/config"
 	_ "github.com/go-sql-driver/mysql"
 	"html"
 	"strings"
@@ -38,7 +39,7 @@ func init() {
 func conn() (db *sql.DB, err error) {
 
 	// 连接MySQL
-	if db, err = sql.Open("mysql", "root:abc123456@tcp(127.0.0.1:3306)/ddz?charset=utf8"); err != nil {
+	if db, err = sql.Open("mysql", config.G_config.ApiDatabaseConf); err != nil {
 		panic(errors.New("数据库连接失败！原因是：" + err.Error()))
 	}
 
