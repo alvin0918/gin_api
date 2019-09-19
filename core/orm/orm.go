@@ -57,7 +57,7 @@ func (DBConfig *MysqlDBConfig) Where(str string, mode string) *MysqlDBConfig {
 	if DBConfig.where == "" {
 		DBConfig.where = " WHERE " + str
 	} else {
-		DBConfig.where = " " + mode + " " + str
+		DBConfig.where += " " + mode + " " + str
 	}
 
 	return DBConfig

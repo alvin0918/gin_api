@@ -6,6 +6,15 @@ import (
 )
 
 func Init(r *gin.Engine)  {
-	r.GET("/", UserController.Index)
-	r.POST("/userLogin", UserController.UserLogin)
+
+	var (
+		model *gin.RouterGroup
+	)
+
+	// User模块
+	model = r.Group("/user")
+	{
+		model.GET("/", UserController.Index)
+		model.POST("/userLogin", UserController.UserLogin)
+	}
 }

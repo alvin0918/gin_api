@@ -1,6 +1,9 @@
 package userModel
 
-import ORM "github.com/alvin0918/gin_api/core/orm"
+import (
+	"fmt"
+	ORM "github.com/alvin0918/gin_api/core/orm"
+)
 
 var (
 	TableName  string = "luffy_user"
@@ -28,8 +31,9 @@ func (user *User) CheckUserAndPassword() (data map[string]string, err error) {
 	data = make(map[string]string)
 
 	if data, err = ORM.DBConfig.TableName(TableName).
-		Where("username = '" + user.Username + "'", "and").
-		Where("password = '" + user.Password + "'", "and").
+		Where(fmt.Sprintf("username = %s", user.Username), "and").
+		Where(fmt.Sprintf("password = %s", user.Password), "and").
+		IsPrintSql(true).
 		Find(); err != nil {
 		return
 	}
