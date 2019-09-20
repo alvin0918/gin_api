@@ -5,10 +5,8 @@ import (
 	ORM "github.com/alvin0918/gin_api/core/orm"
 )
 
-var (
-	TableName  string = "luffy_user"
-	PrimaryKey string = "id"
-)
+const TableName string = "luffy_user"
+const PrimaryKey string = "id"
 
 type User struct {
 	ID          int    `json:"id"`

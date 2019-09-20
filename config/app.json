@@ -3,5 +3,9 @@
   "apiHostAndPort": "127.0.0.1:8090",
 
   "数据库配置": "数据库详细配置",
-  "apiDatabaseConf": "root:abc123456@tcp(148.70.167.240:3306)/ddz?charset=utf8"
+  "apiDatabaseConf": "root:abc123456@tcp(148.70.167.240:3306)/ddz?charset=utf8",
+
+  "Redis配置": "Redis链接配置",
+  "apiRedis": "148.70.167.240:6379",
+  "apiRedisPassWord": ""
 }

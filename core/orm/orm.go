@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type MysqlDBConfig struct {
+type MysqlConfig struct {
 	where     string
 	orderBy   string
 	groupBy   string
@@ -22,16 +22,7 @@ type MysqlDBConfig struct {
 	query     string
 }
 
-var DBConfig *MysqlDBConfig
-
-/**
-初始化数据库
-*/
-func init() {
-	DBConfig = &MysqlDBConfig{
-		isSql:false,
-	}
-}
+var DBConfig *MysqlConfig = &MysqlConfig{ isSql:false,}
 
 /**
 连接数据库
@@ -53,102 +44,102 @@ func conn() (db *sql.DB, err error) {
 /**
 设置WHERE条件，支持链式重复调用
 */
-func (DBConfig *MysqlDBConfig) Where(str string, mode string) *MysqlDBConfig {
-	if DBConfig.where == "" {
-		DBConfig.where = " WHERE " + str
+func (MysqlDBConfig *MysqlConfig) Where(str string, mode string) *MysqlConfig {
+	if MysqlDBConfig.where == "" {
+		MysqlDBConfig.where = " WHERE " + str
 	} else {
-		DBConfig.where += " " + mode + " " + str
+		MysqlDBConfig.where += " " + mode + " " + str
 	}
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 设置查询字段，支持链式，支持重复调用
 */
-func (DBConfig *MysqlDBConfig) Field(str string) *MysqlDBConfig {
-	if DBConfig.field == "" {
-		DBConfig.field = str
+func (MysqlDBConfig *MysqlConfig) Field(str string) *MysqlConfig {
+	if MysqlDBConfig.field == "" {
+		MysqlDBConfig.field = str
 	} else {
-		DBConfig.field = ", " + str
+		MysqlDBConfig.field = ", " + str
 	}
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 设置排序条件，支持链式，不支持重复调用
 */
-func (DBConfig *MysqlDBConfig) OrderBy(str string, mode string) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) OrderBy(str string, mode string) *MysqlConfig {
 
-	DBConfig.orderBy = str + " " + mode
+	MysqlDBConfig.orderBy = str + " " + mode
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 设置数据表
 */
-func (DBConfig *MysqlDBConfig) TableName(str string) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) TableName(str string) *MysqlConfig {
 
-	DBConfig.tableName = str
+	MysqlDBConfig.tableName = str
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 设置数据表
 */
-func (DBConfig *MysqlDBConfig) Alias(str string) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) Alias(str string) *MysqlConfig {
 
-	DBConfig.alias = str
+	MysqlDBConfig.alias = str
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 设置分组排序，支持链式调用，不支持重复使用
 */
-func (DBConfig *MysqlDBConfig) GroupBy(str string, mode string) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) GroupBy(str string, mode string) *MysqlConfig {
 
-	DBConfig.orderBy = str + " " + mode
+	MysqlDBConfig.orderBy = str + " " + mode
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 连表操作，支持链式，支持重复调用
 */
-func (DBConfig *MysqlDBConfig) Join(str string, mode string) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) Join(str string, mode string) *MysqlConfig {
 
 	switch strings.ToLower(mode) {
 	case "inner":
-		DBConfig.join = " INNER JOIN " + str
+		MysqlDBConfig.join = " INNER JOIN " + str
 	case "right":
-		DBConfig.join = " RIGHT JOIN " + str
+		MysqlDBConfig.join = " RIGHT JOIN " + str
 	case "left":
-		DBConfig.join = " LEFT JOIN " + str
+		MysqlDBConfig.join = " LEFT JOIN " + str
 	default:
 		panic(errors.New("Abnormal parameter！"))
 	}
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 是否打印SQL
  */
-func (DBConfig *MysqlDBConfig) IsPrintSql(mode bool) *MysqlDBConfig {
+func (MysqlDBConfig *MysqlConfig) IsPrintSql(mode bool) *MysqlConfig {
 
-	DBConfig.isSql = mode
+	MysqlDBConfig.isSql = mode
 
-	return DBConfig
+	return MysqlDBConfig
 }
 
 /**
 查询数据， 返回结果map
 */
-func (DBConfig *MysqlDBConfig) Select() (result map[int]map[string]string, err error) {
+func (MysqlDBConfig *MysqlConfig) Select() (result map[int]map[string]string, err error) {
 
 	var (
 		query string
@@ -174,7 +165,7 @@ func (DBConfig *MysqlDBConfig) Select() (result map[int]map[string]string, err e
 	str = "SELECT"
 
 	// 获取SQL语句
-	query = DBConfig.analysisSql(str)
+	query = MysqlDBConfig.analysisSql(str)
 
 	if rows, err = db.Query(query); err != nil {
 		panic(errors.New("查询失败!" + err.Error()))
@@ -221,19 +212,21 @@ func (DBConfig *MysqlDBConfig) Select() (result map[int]map[string]string, err e
 		i++
 	}
 
+	DBConfig = &MysqlConfig{isSql:false,}
+
 	return
 }
 
 /**
 指查询一条
  */
-func (DBConfig *MysqlDBConfig) Find() (result map[string]string, err error) {
+func (MysqlDBConfig *MysqlConfig) Find() (result map[string]string, err error) {
 
 	var (
 		rows map[int]map[string]string
 	)
 
-	rows, err = DBConfig.Select()
+	rows, err = MysqlDBConfig.Select()
 
 	if len(rows[0]) > 0 {
 		result = rows[0]
@@ -245,7 +238,7 @@ func (DBConfig *MysqlDBConfig) Find() (result map[string]string, err error) {
 /**
 插入数据 isRows true 返回影响的行数 FALSE 返回最后一行的主键ID
 */
-func (DBConfig *MysqlDBConfig) Insert(data map[string]string, isRows bool) (rows int64, err error) {
+func (MysqlDBConfig *MysqlConfig) Insert(data map[string]string, isRows bool) (rows int64, err error) {
 
 	var (
 		query  string
@@ -267,7 +260,7 @@ func (DBConfig *MysqlDBConfig) Insert(data map[string]string, isRows bool) (rows
 	str = "INSERT"
 
 	// 获取SQL语句
-	query = DBConfig.analysisSqls(data, str)
+	query = MysqlDBConfig.analysisSqls(data, str)
 
 	if stmt, err = db.Prepare(query); err != nil {
 		panic(errors.New(err.Error()))
@@ -294,7 +287,7 @@ func (DBConfig *MysqlDBConfig) Insert(data map[string]string, isRows bool) (rows
 /**
 修改数据 isRows true 返回影响的行数 FALSE 返回最后一行的主键ID
 */
-func (DBConfig *MysqlDBConfig) Update(data map[string]string, isRows bool) (rows int64, err error) {
+func (MysqlDBConfig *MysqlConfig) Update(data map[string]string, isRows bool) (rows int64, err error) {
 
 	var (
 		query  string
@@ -311,7 +304,7 @@ func (DBConfig *MysqlDBConfig) Update(data map[string]string, isRows bool) (rows
 	str = "Upload"
 
 	// 获取SQL语句
-	query = DBConfig.analysisSqls(data, str)
+	query = MysqlDBConfig.analysisSqls(data, str)
 
 	// 每次调用首相初始化一个连接
 	if db, err = conn(); err != nil {
@@ -343,7 +336,7 @@ func (DBConfig *MysqlDBConfig) Update(data map[string]string, isRows bool) (rows
 /**
 删除数据 isRows true 返回影响的行数 FALSE 返回最后一行的主键ID
 */
-func (DBConfig *MysqlDBConfig) Delete(isRows bool) (rows int64, err error) {
+func (MysqlDBConfig *MysqlConfig) Delete(isRows bool) (rows int64, err error) {
 
 	var (
 		query  string
@@ -365,7 +358,7 @@ func (DBConfig *MysqlDBConfig) Delete(isRows bool) (rows int64, err error) {
 	str = "DELETE"
 
 	// 获取SQL语句
-	query = DBConfig.analysisSql(str)
+	query = MysqlDBConfig.analysisSql(str)
 
 	if stmt, err = db.Prepare(query); err != nil {
 		panic(errors.New(err.Error()))
@@ -392,38 +385,38 @@ func (DBConfig *MysqlDBConfig) Delete(isRows bool) (rows int64, err error) {
 /**
 根据查询模式，获取SQL
 */
-func (DBConfig *MysqlDBConfig) analysisSql(mode string) (str string) {
+func (MysqlDBConfig *MysqlConfig) analysisSql(mode string) (str string) {
 
 	str = strings.ToUpper(mode)
 
 	switch str {
 	case "UPDATE":
-		if DBConfig.tableName == "" {
+		if MysqlDBConfig.tableName == "" {
 			panic(errors.New("不能没有表名呀兄弟！"))
 		}
 
-		str += " " + DBConfig.tableName + " SET "
+		str += " " + MysqlDBConfig.tableName + " SET "
 
-		if DBConfig.field == "" {
+		if MysqlDBConfig.field == "" {
 			panic(errors.New("需要修改字段及数据"))
 		}
 
-		str += " " + DBConfig.field
+		str += " " + MysqlDBConfig.field
 
-		if DBConfig.where != "" {
-			str += " " + DBConfig.where
+		if MysqlDBConfig.where != "" {
+			str += " " + MysqlDBConfig.where
 		}
 
 	case "DELETE":
 
-		if DBConfig.tableName == "" {
+		if MysqlDBConfig.tableName == "" {
 			panic(errors.New("不能没有表名呀兄弟！"))
 		}
 
-		str += " FROM " + DBConfig.tableName
+		str += " FROM " + MysqlDBConfig.tableName
 
-		if DBConfig.where != "" {
-			str += " " + DBConfig.where
+		if MysqlDBConfig.where != "" {
+			str += " " + MysqlDBConfig.where
 		} else {
 			panic(errors.New("这个操作太危险啦！真那么想不开的话设置成 1 = 1吧！"))
 		}
@@ -431,48 +424,48 @@ func (DBConfig *MysqlDBConfig) analysisSql(mode string) (str string) {
 	case "SELECT":
 
 		// 格式化查询字段
-		if DBConfig.field != "" {
-			str += " " + DBConfig.field
+		if MysqlDBConfig.field != "" {
+			str += " " + MysqlDBConfig.field
 		} else {
 			str += " * "
 		}
 
 		// 设置表名
-		if DBConfig.tableName != "" {
-			str += " FROM " + DBConfig.tableName
+		if MysqlDBConfig.tableName != "" {
+			str += " FROM " + MysqlDBConfig.tableName
 		} else {
 			panic(errors.New("Can't Find TableName！"))
 		}
 
 		// 设置表别名
-		if DBConfig.alias != "" {
-			str += " AS " + DBConfig.alias
+		if MysqlDBConfig.alias != "" {
+			str += " AS " + MysqlDBConfig.alias
 		}
 
 		// 格式化查询条件
-		if DBConfig.where != "" {
-			str += " " + DBConfig.where
+		if MysqlDBConfig.where != "" {
+			str += " " + MysqlDBConfig.where
 		}
 
 		// 格式化分组
-		if DBConfig.groupBy != "" {
-			str += " " + DBConfig.groupBy
+		if MysqlDBConfig.groupBy != "" {
+			str += " " + MysqlDBConfig.groupBy
 		}
 
 		// 格式化排序
-		if DBConfig.orderBy != "" {
-			str += " " + DBConfig.orderBy
+		if MysqlDBConfig.orderBy != "" {
+			str += " " + MysqlDBConfig.orderBy
 		}
 	default:
 		// 执行原生SQL
-		return DBConfig.query
+		return MysqlDBConfig.query
 	}
 
 	// SQL语句格式化，简要避免SQL注入
 	str = html.EscapeString(str)
 
 	// 是否打印SQL
-	if DBConfig.isSql {
+	if MysqlDBConfig.isSql {
 		fmt.Println(str)
 	}
 
@@ -482,18 +475,18 @@ func (DBConfig *MysqlDBConfig) analysisSql(mode string) (str string) {
 /**
 根据查询模式，获取SQL
 */
-func (DBConfig *MysqlDBConfig) analysisSqls(data map[string]string, mode string) (str string) {
+func (MysqlDBConfig *MysqlConfig) analysisSqls(data map[string]string, mode string) (str string) {
 
 	str = strings.ToUpper(mode)
 
 	switch str {
 	case "INSERT":
 
-		if DBConfig.tableName == "" {
+		if MysqlDBConfig.tableName == "" {
 			panic(errors.New("不能没有表名呀兄弟！"))
 		}
 
-		str += " INTO " + DBConfig.tableName
+		str += " INTO " + MysqlDBConfig.tableName
 
 		var key string = "("
 		var value string = "("
@@ -513,35 +506,35 @@ func (DBConfig *MysqlDBConfig) analysisSqls(data map[string]string, mode string)
 
 		str += " " + key + " VALUES " + value
 
-		if DBConfig.where != "" {
-			str += " " + DBConfig.where
+		if MysqlDBConfig.where != "" {
+			str += " " + MysqlDBConfig.where
 		}
 
 	case "UPDATE":
-		if DBConfig.tableName == "" {
+		if MysqlDBConfig.tableName == "" {
 			panic(errors.New("不能没有表名呀兄弟！"))
 		}
 
-		str += " " + DBConfig.tableName + " SET "
+		str += " " + MysqlDBConfig.tableName + " SET "
 
 		for k, v := range data{
 			str += " " + k + " = " + v + ","
 		}
 
-		if DBConfig.where != "" {
-			str += " " + DBConfig.where
+		if MysqlDBConfig.where != "" {
+			str += " " + MysqlDBConfig.where
 		}
 
 	default:
 		// 执行原生SQL
-		return DBConfig.query
+		return MysqlDBConfig.query
 	}
 
 	// SQL语句格式化，简要避免SQL注入
 	str = html.EscapeString(str)
 
 	// 是否打印SQL
-	if DBConfig.isSql {
+	if MysqlDBConfig.isSql {
 		fmt.Println(str)
 	}
 
